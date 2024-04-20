@@ -8,7 +8,7 @@ import (
 func Err(c *fiber.Ctx, status int, msg string, errs error) error {
 	return c.Status(status).JSON(fiber.Map{
 		"message": msg,
-		"errors":  errs,
+		"errors":  errs.Error(),
 	})
 }
 
