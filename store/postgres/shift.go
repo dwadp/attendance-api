@@ -12,7 +12,7 @@ import (
 func (p *Postgres) FindAllShifts(ctx context.Context) ([]*models.Shift, error) {
 	var shifts []*models.Shift
 
-	query := `SELECT id, name, "in", "out", "created_at", "updated_at" FROM shifts`
+	query := `SELECT id, name, "in", "out", "is_default", "created_at", "updated_at" FROM shifts`
 	rows, err := p.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -27,6 +27,7 @@ func (p *Postgres) FindAllShifts(ctx context.Context) ([]*models.Shift, error) {
 			&shift.Name,
 			&shift.In,
 			&shift.Out,
+			&shift.IsDefault,
 			&shift.CreatedAt,
 			&shift.UpdatedAt,
 		); err != nil {
@@ -43,20 +44,38 @@ func (p *Postgres) CreateShift(ctx context.Context, create models.UpsertShift) (
 	var shift models.Shift
 
 	query := `
-		INSERT INTO shifts ("name", "in", "out", "created_at", "updated_at")
-		VALUES ($1, $2, $3, now(), now())
-		RETURNING "id", "name", "in", "out", "created_at", "updated_at"`
+		INSERT INTO shifts ("name", "in", "out", "is_default")
+		VALUES ($1, $2, $3, $4)
+		RETURNING "id", "name", "in", "out", "is_default", "created_at", "updated_at"`
 
-	err := p.db.
-		QueryRowContext(ctx, query, create.Name, create.In, create.Out).
+	tx, err := p.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.
+		QueryRowContext(ctx, query, create.Name, create.In, create.Out, create.IsDefault).
 		Scan(&shift.ID,
 			&shift.Name,
 			&shift.In,
 			&shift.Out,
+			&shift.IsDefault,
 			&shift.CreatedAt,
 			&shift.UpdatedAt)
 
 	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if create.IsDefault {
+		if err := p.resetDefault(ctx, tx, shift.ID); err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
@@ -66,7 +85,7 @@ func (p *Postgres) CreateShift(ctx context.Context, create models.UpsertShift) (
 func (p *Postgres) FindShiftByID(ctx context.Context, id uint) (*models.Shift, error) {
 	var shift models.Shift
 
-	query := `SELECT "id", "name", "in", "out", "created_at", "updated_at" FROM shifts WHERE "id" = $1`
+	query := `SELECT "id", "name", "in", "out", "is_default", "created_at", "updated_at" FROM shifts WHERE "id" = $1`
 	row := p.db.QueryRowContext(ctx, query, id)
 
 	if err := row.Scan(
@@ -74,6 +93,7 @@ func (p *Postgres) FindShiftByID(ctx context.Context, id uint) (*models.Shift, e
 		&shift.Name,
 		&shift.In,
 		&shift.Out,
+		&shift.IsDefault,
 		&shift.CreatedAt,
 		&shift.UpdatedAt,
 	); err != nil {
@@ -91,14 +111,21 @@ func (p *Postgres) UpdateShift(ctx context.Context, id uint, update models.Upser
 
 	query := `
 		UPDATE shifts
-		SET "name"=$1, "in"=$2, "out"=$3, "updated_at"=now() WHERE id = $4
-		RETURNING "id", "name", "in", "out", "updated_at", "created_at"`
-	row := p.db.QueryRowContext(
+		SET "name"=$1, "in"=$2, "out"=$3, "is_default"=$4, "updated_at"=now() WHERE id = $5
+		RETURNING "id", "name", "in", "out", "is_default", "updated_at", "created_at"`
+
+	tx, err := p.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	row := tx.QueryRowContext(
 		ctx,
 		query,
 		update.Name,
 		update.In,
 		update.Out,
+		update.IsDefault,
 		id,
 	)
 
@@ -107,13 +134,37 @@ func (p *Postgres) UpdateShift(ctx context.Context, id uint, update models.Upser
 		&shift.Name,
 		&shift.In,
 		&shift.Out,
+		&shift.IsDefault,
 		&shift.CreatedAt,
 		&shift.UpdatedAt,
 	); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if update.IsDefault {
+		if err := p.resetDefault(ctx, tx, shift.ID); err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
 	return &shift, nil
+}
+
+func (p *Postgres) resetDefault(ctx context.Context, tx *sql.Tx, excludeID uint) error {
+	query := `UPDATE shifts SET is_default=false WHERE is_default=true AND id != $1`
+
+	_, err := tx.ExecContext(ctx, query, excludeID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Postgres) DeleteShift(ctx context.Context, id uint) error {
