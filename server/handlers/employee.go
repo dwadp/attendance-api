@@ -21,12 +21,16 @@ func handleGetListEmployee(store store.Store) fiber.Handler {
 	}
 }
 
-func handleCreateEmployee(store store.Store) fiber.Handler {
+func handleCreateEmployee(store store.Store, v *validator.Validator) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var create models.UpsertEmployee
 
 		if err := c.BodyParser(&create); err != nil {
 			return response.ErrBadRequest(c, fmt.Errorf("unable to parse request body: %v", err))
+		}
+
+		if err := v.Validate(create); err != nil {
+			return response.ErrUnprocessableEntity(c, v.SerializeErrors(err, create))
 		}
 
 		employee, err := store.CreateEmployee(c.UserContext(), create)
@@ -105,7 +109,7 @@ func handleUpdateEmployee(store store.Store, v *validator.Validator) fiber.Handl
 
 func RegisterEmployee(router fiber.Router, store store.Store, v *validator.Validator) {
 	router.Get("/", handleGetListEmployee(store))
-	router.Post("/", handleCreateEmployee(store))
+	router.Post("/", handleCreateEmployee(store, v))
 	router.Get("/:id", handleGetDetailEmployee(store))
 	router.Delete("/:id", handleDeleteEmployee(store))
 	router.Put("/:id", handleUpdateEmployee(store, v))
