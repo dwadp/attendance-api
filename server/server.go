@@ -34,6 +34,7 @@ func New(cfg *config.Config, s store.Store, db *sql.DB, validator *validator.Val
 
 func (s *Server) Start() error {
 	handlers.RegisterEmployee(s.App.Group("employees"), s.Store, s.Validator)
+	handlers.RegisterShift(s.App.Group("shifts"), s.Store, s.Validator)
 
 	go func() {
 		if err := s.App.Listen(net.JoinHostPort(s.Config.Server.Host, s.Config.Server.Port)); err != nil {

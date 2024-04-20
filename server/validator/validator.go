@@ -3,12 +3,14 @@ package validator
 import (
 	"errors"
 	"fmt"
+	"github.com/dwadp/attendance-api/store/db"
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	"reflect"
 	"regexp"
+	"time"
 )
 
 type Validator struct {
@@ -45,7 +47,7 @@ func New() (*Validator, error) {
 }
 
 func (v *Validator) registerRegexes() error {
-	timeRegex, err := regexp.Compile("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")
+	timeRegex, err := regexp.Compile("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")
 	if err != nil {
 		return err
 	}
@@ -86,9 +88,18 @@ func (v *Validator) SerializeErrors(err error, kind any) map[string]string {
 
 func (v *Validator) registerTimeValidator() (err error) {
 	err = v.validate.RegisterValidation("time", func(fl validator.FieldLevel) bool {
-		value := fl.Field().String()
+		value := fl.Field().Interface()
 
-		return v.timeRegexValidator.MatchString(value)
+		switch a := value.(type) {
+		case db.Time:
+			return v.timeRegexValidator.MatchString(a.String())
+		case time.Time:
+			return v.timeRegexValidator.MatchString(a.Format("15:04:05"))
+		case string:
+			return v.timeRegexValidator.MatchString(a)
+		}
+
+		return false
 	})
 
 	if err != nil {

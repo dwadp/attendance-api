@@ -4,8 +4,8 @@ import (
 	"github.com/dwadp/attendance-api/config"
 	"github.com/dwadp/attendance-api/server"
 	"github.com/dwadp/attendance-api/server/validator"
-	"github.com/dwadp/attendance-api/store"
 	"github.com/dwadp/attendance-api/store/db"
+	"github.com/dwadp/attendance-api/store/postgres"
 	"github.com/rs/zerolog/log"
 	"os"
 	"path"
@@ -29,7 +29,7 @@ var rootCmd = &cobra.Command{
 			log.Fatal().Err(err).Msg("Unable to connect to the database")
 		}
 
-		s := store.NewPostgres(database)
+		s := postgres.NewPostgres(database)
 		v, err := validator.New()
 		if err != nil {
 			log.Fatal().Err(err).Msg("Unable to create validator")
