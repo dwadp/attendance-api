@@ -125,7 +125,7 @@ func handleEmployeeShiftAssignment(store store.Store) fiber.Handler {
 
 		result, err := s.AssignEmployee(c.UserContext(), assign)
 		if err != nil {
-			if errors.Is(err, shiftInt.ErrIsOnHoliday) {
+			if errors.Is(err, holiday.ErrIsOnHoliday) {
 				return response.ErrBadRequest(c, err)
 			}
 			return response.ErrInternalServer(c, err)

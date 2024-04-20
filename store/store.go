@@ -28,4 +28,9 @@ type Store interface {
 	// Holidays
 
 	FindAllHolidays(ctx context.Context, date time.Time) ([]*models.Holiday, error)
+
+	// Day Offs
+
+	FindDayOff(ctx context.Context, employeeID uint, date time.Time) (*models.DayOff, error)
+	SaveDayOff(ctx context.Context, dayOff models.DayOff) (*models.DayOff, error)
 }

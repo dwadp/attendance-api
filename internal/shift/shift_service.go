@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	ErrIsOnHoliday = errors.New("could not assign shift on holiday")
+	ErrShiftExists = errors.New("shift already exists")
 )
 
 type Service struct {
@@ -25,15 +25,15 @@ func NewService(store store.Store, hService *holiday.Service) *Service {
 }
 
 func (s *Service) AssignEmployee(ctx context.Context, assign models.AssignEmployeeShift) (*models.EmployeeShift, error) {
-	existing, err := s.store.FindEmployeeShift(ctx, assign.EmployeeID, assign.ShiftID, assign.Date.T)
+	existingShift, err := s.store.FindEmployeeShift(ctx, assign.EmployeeID, assign.ShiftID, assign.Date.T)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, err
 		}
 	}
 
-	if existing != nil {
-		return existing, nil
+	if existingShift != nil {
+		return existingShift, nil
 	}
 
 	employee, err := s.store.FindEmployeeByID(ctx, assign.EmployeeID)
@@ -54,9 +54,9 @@ func (s *Service) AssignEmployee(ctx context.Context, assign models.AssignEmploy
 
 	if h := s.hService.IsHolidayExistOn(assign.Date.T); h != nil {
 		if h.Type == holiday.Weekend {
-			return nil, ErrIsOnHoliday
+			return nil, holiday.ErrIsOnHoliday
 		} else if h.Type == holiday.NationalHoliday {
-			return nil, ErrIsOnHoliday
+			return nil, holiday.ErrIsOnHoliday
 		}
 	}
 

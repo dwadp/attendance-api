@@ -1,6 +1,7 @@
 package holiday
 
 import (
+	"errors"
 	"github.com/dwadp/attendance-api/models"
 	"time"
 )
@@ -8,6 +9,10 @@ import (
 const (
 	Weekend int = iota
 	NationalHoliday
+)
+
+var (
+	ErrIsOnHoliday = errors.New("could not assign shift on holiday")
 )
 
 type Service struct {
