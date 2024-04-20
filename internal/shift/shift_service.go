@@ -22,7 +22,7 @@ func NewService(store store.Store, hService *holiday.Service) *Service {
 }
 
 func (s *Service) AssignEmployee(ctx context.Context, assign models.AssignEmployeeShift) (*models.EmployeeShift, error) {
-	existingShift, err := s.store.FindEmployeeShift(ctx, assign.EmployeeID, assign.ShiftID, assign.Date.T)
+	existingShift, err := s.store.FindEmployeeShift(ctx, assign.EmployeeID, assign.Date.T)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, err

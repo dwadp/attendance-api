@@ -27,7 +27,7 @@ func (s *Service) Create(ctx context.Context, request models.DayOffRequest) (*mo
 		return nil, internal.ErrIsOnHoliday
 	}
 
-	existingShift, err := s.store.FindEmployeeShift(ctx, request.EmployeeID, 0, request.Date.T)
+	existingShift, err := s.store.FindEmployeeShift(ctx, request.EmployeeID, request.Date.T)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return nil, err

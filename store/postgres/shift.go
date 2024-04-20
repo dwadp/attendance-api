@@ -134,19 +134,12 @@ func (p *Postgres) DeleteShift(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (p *Postgres) FindEmployeeShift(ctx context.Context, employeeID uint, shiftID uint, date time.Time) (*models.EmployeeShift, error) {
+func (p *Postgres) FindEmployeeShift(ctx context.Context, employeeID uint, date time.Time) (*models.EmployeeShift, error) {
 	var employeeShift models.EmployeeShift
 
 	query := `SELECT id, employee_id, shift_id, date, created_at FROM employee_shifts WHERE date = $1 AND employee_id = $2`
-	args := []any{date.Format("2006-01-02"), employeeID}
-
-	if shiftID != 0 {
-		query += " AND shift_id = $3"
-		args = append(args, shiftID)
-	}
-
 	err := p.db.
-		QueryRowContext(ctx, query, args...).
+		QueryRowContext(ctx, query, date.Format("2006-01-02"), employeeID).
 		Scan(
 			&employeeShift.ID,
 			&employeeShift.EmployeeID,
