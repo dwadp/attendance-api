@@ -24,6 +24,7 @@ type Store interface {
 	DeleteShift(ctx context.Context, id uint) error
 	FindEmployeeShift(ctx context.Context, employeeID uint, date time.Time) (*models.EmployeeShift, error)
 	SaveEmployeeShift(ctx context.Context, employeeShift models.EmployeeShift) (*models.EmployeeShift, error)
+	DeleteEmployeeShift(ctx context.Context, unassign models.UnassignEmployeeShift) error
 
 	// Holidays
 

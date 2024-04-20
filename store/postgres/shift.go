@@ -166,3 +166,25 @@ func (p *Postgres) SaveEmployeeShift(ctx context.Context, employeeShift models.E
 
 	return &employeeShift, nil
 }
+
+func (p *Postgres) DeleteEmployeeShift(ctx context.Context, unassign models.UnassignEmployeeShift) error {
+	result, err := p.db.ExecContext(
+		ctx,
+		"DELETE FROM employee_shifts WHERE employee_id = $1 AND date = $2",
+		unassign.EmployeeID,
+		unassign.Date)
+	if err != nil {
+		return err
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
