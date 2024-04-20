@@ -3,9 +3,9 @@ package handlers
 import (
 	"errors"
 	"fmt"
+	"github.com/dwadp/attendance-api/internal"
 	"github.com/dwadp/attendance-api/internal/dayoff"
 	"github.com/dwadp/attendance-api/internal/holiday"
-	"github.com/dwadp/attendance-api/internal/shift"
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/server/response"
 	"github.com/dwadp/attendance-api/server/validator"
@@ -34,9 +34,9 @@ func handleRequestDayOff(store store.Store, v *validator.Validator) fiber.Handle
 
 		result, err := dayOffService.Create(c.UserContext(), request)
 		if err != nil {
-			if errors.Is(err, shift.ErrShiftExists) {
+			if errors.Is(err, internal.ErrShiftExists) {
 				return response.ErrBadRequest(c, err)
-			} else if errors.Is(err, holiday.ErrIsOnHoliday) {
+			} else if errors.Is(err, internal.ErrIsOnHoliday) {
 				return response.ErrBadRequest(c, err)
 			}
 

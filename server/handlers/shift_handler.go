@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"fmt"
+	"github.com/dwadp/attendance-api/internal"
 	"github.com/dwadp/attendance-api/internal/holiday"
 	shiftInt "github.com/dwadp/attendance-api/internal/shift"
 	"github.com/dwadp/attendance-api/models"
@@ -125,9 +126,12 @@ func handleEmployeeShiftAssignment(store store.Store) fiber.Handler {
 
 		result, err := s.AssignEmployee(c.UserContext(), assign)
 		if err != nil {
-			if errors.Is(err, holiday.ErrIsOnHoliday) {
+			if errors.Is(err, internal.ErrIsOnHoliday) {
+				return response.ErrBadRequest(c, err)
+			} else if errors.Is(err, internal.ErrDayOffExistsOnDate) {
 				return response.ErrBadRequest(c, err)
 			}
+
 			return response.ErrInternalServer(c, err)
 		}
 

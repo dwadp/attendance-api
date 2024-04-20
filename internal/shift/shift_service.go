@@ -5,14 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/dwadp/attendance-api/internal"
 	"github.com/dwadp/attendance-api/internal/holiday"
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/store"
 	"github.com/dwadp/attendance-api/store/db"
-)
-
-var (
-	ErrShiftExists = errors.New("shift already exists")
 )
 
 type Service struct {
@@ -36,6 +33,17 @@ func (s *Service) AssignEmployee(ctx context.Context, assign models.AssignEmploy
 		return existingShift, nil
 	}
 
+	existingDayOff, err := s.store.FindDayOff(ctx, assign.EmployeeID, assign.Date.T)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+	}
+
+	if existingDayOff != nil {
+		return nil, internal.ErrDayOffExistsOnDate
+	}
+
 	employee, err := s.store.FindEmployeeByID(ctx, assign.EmployeeID)
 	if err != nil {
 		var errDataNotFound *db.ErrDataNotFound[uint]
@@ -54,9 +62,9 @@ func (s *Service) AssignEmployee(ctx context.Context, assign models.AssignEmploy
 
 	if h := s.hService.IsHolidayExistOn(assign.Date.T); h != nil {
 		if h.Type == holiday.Weekend {
-			return nil, holiday.ErrIsOnHoliday
+			return nil, internal.ErrIsOnHoliday
 		} else if h.Type == holiday.NationalHoliday {
-			return nil, holiday.ErrIsOnHoliday
+			return nil, internal.ErrIsOnHoliday
 		}
 	}
 
