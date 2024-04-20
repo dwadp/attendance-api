@@ -28,6 +28,88 @@ func (s *NullableDateTime) MarshalJSON() ([]byte, error) {
 	return result, nil
 }
 
+type Date struct {
+	T     time.Time
+	Valid bool
+}
+
+// Scan implements the [Scanner] interface.
+func (d *Date) Scan(value any) error {
+	if value == nil {
+		*d = Date{T: time.Time{}, Valid: false}
+		return nil
+	}
+
+	switch v := value.(type) {
+	case string:
+		r, err := time.Parse("2006-01-02", v)
+		if err != nil {
+			return err
+		}
+
+		*d = Date{T: r, Valid: true}
+	case time.Time:
+		*d = Date{T: time.Date(v.Year(), v.Month(), v.Day(), 0, 0, 0, 0, v.Location()), Valid: true}
+	case []byte:
+		r, err := time.Parse("2006-01-02", string(v))
+		if err != nil {
+			return nil
+		}
+		*d = Date{T: r, Valid: true}
+	}
+
+	return nil
+}
+
+// Value implements the [driver.Valuer] interface.
+func (d Date) Value() (driver.Value, error) {
+	if !d.Valid {
+		return nil, nil
+	}
+
+	return d.T.Format("2006-01-02"), nil
+}
+
+// MarshalJSON implements the [json.Marshaler] interface.
+func (d *Date) MarshalJSON() ([]byte, error) {
+	if !d.Valid {
+		return []byte("null"), nil
+	}
+
+	result, err := json.Marshal(d.T.Format("2006-01-02"))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// UnmarshalJSON implements the [json.Unmarshaler] interface.
+func (d *Date) UnmarshalJSON(data []byte) error {
+	if d == nil {
+		return errors.New("UnmarshalJSON on nil pointer")
+	}
+
+	value := strings.Trim(string(data), "\"")
+
+	res, err := time.Parse("2006-01-02", value)
+	if err != nil {
+		return fmt.Errorf("Unable to unmarshall time invalid format: %w", err)
+	}
+
+	*d = Date{T: res, Valid: true}
+	return nil
+}
+
+func (d *Date) String() string {
+	if !d.Valid {
+		return ""
+	}
+
+	return d.T.Format("15:04:05")
+}
+
 // Time represents a 24 hours format time (HH:MM:SS) without a date. It could also be a null time
 type Time struct {
 	T     time.Time

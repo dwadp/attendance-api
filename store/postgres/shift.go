@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/store/db"
+	"time"
 )
 
 func (p *Postgres) FindAllShifts(ctx context.Context) ([]*models.Shift, error) {
@@ -131,4 +132,37 @@ func (p *Postgres) DeleteShift(ctx context.Context, id uint) error {
 	}
 
 	return nil
+}
+
+func (p *Postgres) FindEmployeeShift(ctx context.Context, employeeID uint, shiftID uint, date time.Time) (*models.EmployeeShift, error) {
+	var employeeShift models.EmployeeShift
+
+	query := `SELECT id, employee_id, shift_id, date, created_at FROM employee_shifts WHERE employee_id = $1 AND shift_id = $2 AND date = $3`
+	err := p.db.
+		QueryRowContext(ctx, query, employeeID, shiftID, date).
+		Scan(
+			&employeeShift.ID,
+			&employeeShift.EmployeeID,
+			&employeeShift.ShiftID,
+			&employeeShift.Date,
+			&employeeShift.CreatedAt,
+		)
+	if err != nil {
+		return nil, err
+	}
+
+	return &employeeShift, nil
+}
+
+func (p *Postgres) SaveEmployeeShift(ctx context.Context, employeeShift models.EmployeeShift) (*models.EmployeeShift, error) {
+	query := `INSERT INTO employee_shifts (employee_id, shift_id, date) VALUES ($1, $2, $3) RETURNING id, created_at`
+
+	err := p.db.
+		QueryRowContext(ctx, query, employeeShift.EmployeeID, employeeShift.ShiftID, employeeShift.Date).
+		Scan(&employeeShift.ID, &employeeShift.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &employeeShift, nil
 }

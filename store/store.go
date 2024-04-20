@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"github.com/dwadp/attendance-api/models"
+	"time"
 )
 
 type Store interface {
@@ -21,4 +22,10 @@ type Store interface {
 	FindShiftByID(ctx context.Context, id uint) (*models.Shift, error)
 	UpdateShift(ctx context.Context, id uint, shift models.UpsertShift) (*models.Shift, error)
 	DeleteShift(ctx context.Context, id uint) error
+	FindEmployeeShift(ctx context.Context, employeeID uint, shiftID uint, date time.Time) (*models.EmployeeShift, error)
+	SaveEmployeeShift(ctx context.Context, employeeShift models.EmployeeShift) (*models.EmployeeShift, error)
+
+	// Holidays
+
+	FindAllHolidays(ctx context.Context, date time.Time) ([]*models.Holiday, error)
 }

@@ -3,6 +3,8 @@ package handlers
 import (
 	"errors"
 	"fmt"
+	"github.com/dwadp/attendance-api/internal/holiday"
+	shiftInt "github.com/dwadp/attendance-api/internal/shift"
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/server/response"
 	"github.com/dwadp/attendance-api/server/validator"
@@ -106,10 +108,38 @@ func handleUpdateShift(store store.Store, v *validator.Validator) fiber.Handler 
 	}
 }
 
+func handleEmployeeShiftAssignment(store store.Store) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var assign models.AssignEmployeeShift
+		if err := c.BodyParser(&assign); err != nil {
+			return response.ErrBadRequest(c, fmt.Errorf("unable to parse request body: %v", err))
+		}
+
+		holidays, err := store.FindAllHolidays(c.UserContext(), assign.Date.T)
+		if err != nil {
+			return response.ErrInternalServer(c, err)
+		}
+
+		hService := holiday.NewService(holidays)
+		s := shiftInt.NewService(store, hService)
+
+		result, err := s.AssignEmployee(c.UserContext(), assign)
+		if err != nil {
+			if errors.Is(err, shiftInt.ErrIsOnHoliday) {
+				return response.ErrBadRequest(c, err)
+			}
+			return response.ErrInternalServer(c, err)
+		}
+
+		return response.OK(c, result)
+	}
+}
+
 func RegisterShift(router fiber.Router, store store.Store, v *validator.Validator) {
 	router.Get("/", handleGetListShifts(store))
 	router.Post("/", handleCreateShift(store, v))
 	router.Get("/:id", handleGetDetailShift(store))
 	router.Delete("/:id", handleDeleteShift(store))
 	router.Put("/:id", handleUpdateShift(store, v))
+	router.Post("/assign", handleEmployeeShiftAssignment(store))
 }
