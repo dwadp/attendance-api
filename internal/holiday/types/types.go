@@ -1,6 +1,8 @@
 package types
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type Holiday int
 
@@ -54,8 +56,12 @@ func (w *Weekday) UnmarshalJSON(data []byte) error {
 		break
 	case 6:
 		*w = Saturday
+		break
 	case 7:
 		*w = None
+		break
+	default:
+		*w = Weekday(d)
 	}
 
 	return nil

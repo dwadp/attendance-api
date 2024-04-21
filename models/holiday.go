@@ -19,6 +19,6 @@ type Holiday struct {
 type UpsertHoliday struct {
 	Name    string               `json:"name" validate:"required"`
 	Type    holidayTypes.Holiday `json:"type" validate:"min=0,max=1"`
-	Weekday holidayTypes.Weekday `json:"weekday,omitempty" validate:"required_if=Type 0,min=0,max=7"`
+	Weekday holidayTypes.Weekday `json:"weekday" validate:"min=0,max=7"`
 	Date    db.Date              `json:"date,omitempty" validate:"required_if=Type 1"`
 }
