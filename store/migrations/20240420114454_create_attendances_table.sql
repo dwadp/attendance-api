@@ -15,9 +15,9 @@ create table "public"."attendances" (
     "created_at" timestamp null default NOW(),
     "updated_at" timestamp null default NOW(),
     CONSTRAINT fk_attendances_employee_id
-        FOREIGN KEY(employee_id) REFERENCES employees(id),
+        FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE,
     CONSTRAINT fk_attendances_shift_id
-        FOREIGN KEY(shift_id) REFERENCES shifts(id)
+        FOREIGN KEY(shift_id) REFERENCES shifts(id) ON DELETE SET NULL
 );
 
 CREATE INDEX ON "public"."attendances" (clock_in_status);

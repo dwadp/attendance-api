@@ -7,7 +7,7 @@ create table "public"."employee_day_offs" (
     "date" date not null,
     "created_at" timestamp null default NOW(),
     CONSTRAINT fk_employee_day_offs_employee_id
-        FOREIGN KEY(employee_id) REFERENCES employees(id)
+        FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
 
