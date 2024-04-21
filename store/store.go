@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	holidayTypes "github.com/dwadp/attendance-api/internal/holiday/types"
 	"github.com/dwadp/attendance-api/models"
 	"time"
 )
@@ -29,7 +30,13 @@ type Store interface {
 
 	// Holidays
 
-	FindAllHolidays(ctx context.Context, date time.Time) ([]*models.Holiday, error)
+	FindHolidaysInDate(ctx context.Context, date time.Time) ([]*models.Holiday, error)
+	FindAllHoliday(ctx context.Context) ([]*models.Holiday, error)
+	FindHolidayByDateOrWeekday(ctx context.Context, date time.Time, weekday holidayTypes.Weekday) (*models.Holiday, error)
+	FindHolidayByID(ctx context.Context, id uint) (*models.Holiday, error)
+	CreateHoliday(ctx context.Context, holiday models.UpsertHoliday) (*models.Holiday, error)
+	UpdateHoliday(ctx context.Context, id uint, holiday models.UpsertHoliday) (*models.Holiday, error)
+	DeleteHoliday(ctx context.Context, id uint) error
 
 	// Day Offs
 
