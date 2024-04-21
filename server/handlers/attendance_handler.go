@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"github.com/dwadp/attendance-api/internal/attendance"
 	"github.com/dwadp/attendance-api/internal/attendance/types"
@@ -10,6 +11,7 @@ import (
 	"github.com/dwadp/attendance-api/server/response"
 	"github.com/dwadp/attendance-api/server/validator"
 	"github.com/dwadp/attendance-api/store"
+	"github.com/dwadp/attendance-api/store/db"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 )
@@ -58,11 +60,22 @@ func handleRequestClockOut(service *attendance.Service, v *validator.Validator) 
 	}
 }
 
-func handleListAttendances(service *attendance.Service) fiber.Handler {
+func handleListAttendances(store store.Store, service *attendance.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		employeeID, err := c.ParamsInt("employee_id")
 		if err != nil {
 			return response.ErrBadRequest(c, fmt.Errorf("unable to parse employee_id: %v", err))
+		}
+
+		_, err = store.FindEmployeeByID(c.UserContext(), uint(employeeID))
+		if err != nil {
+			var errDataNotFound *db.ErrDataNotFound[uint]
+
+			if errors.As(err, &errDataNotFound) {
+				return response.ErrNotFound(c, fmt.Errorf("employee ID %d could not be found", employeeID))
+			}
+
+			return response.ErrInternalServer(c, fmt.Errorf("unable to find employee ID %d", employeeID))
 		}
 
 		attendances, err := service.FindAllEmployeeAttendances(c.UserContext(), uint(employeeID))
@@ -83,6 +96,12 @@ func handleExportAttendanceList(service *attendance.Service) fiber.Handler {
 
 		employee, f, err := service.ExportAttendance(c.UserContext(), uint(employeeID))
 		if err != nil {
+			var errDataNotFound *db.ErrDataNotFound[uint]
+
+			if errors.As(err, &errDataNotFound) {
+				return response.ErrNotFound(c, fmt.Errorf("employee ID %d could not be found", employeeID))
+			}
+
 			return response.ErrInternalServer(c, fmt.Errorf("unable to export attendance: %w", err))
 		}
 
@@ -105,6 +124,6 @@ func RegisterAttendance(router fiber.Router, store store.Store, v *validator.Val
 
 	router.Post("/clock-in", handleRequestClockIn(attendanceService, v))
 	router.Post("/clock-out", handleRequestClockOut(attendanceService, v))
-	router.Get("/:employee_id", handleListAttendances(attendanceService))
+	router.Get("/:employee_id", handleListAttendances(store, attendanceService))
 	router.Get("/:employee_id/export", handleExportAttendanceList(attendanceService))
 }
