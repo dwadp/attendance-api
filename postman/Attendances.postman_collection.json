@@ -1,0 +1,570 @@
+{
+	"info": {
+		"_postman_id": "2b20a69d-8205-4f7b-bc61-a27a2f7f81a1",
+		"name": "Attendances",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7645586"
+	},
+	"item": [
+		{
+			"name": "Employee",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Lidya\",\n    \"phone\": \"121902912\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/employees",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/employees",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/employees/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/employees/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Agatha\",\n    \"phone\": \"10210291029120\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/employees/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shifts",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Malam\",\n    \"in\": \"23:00\",\n    \"out\": \"07:00\",\n    \"is_default\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/shifts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/shifts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shifts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/shifts/:shift_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shifts",
+								":shift_id"
+							],
+							"variable": [
+								{
+									"key": "shift_id",
+									"value": "9"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/shifts/:shift_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shifts",
+								":shift_id"
+							],
+							"variable": [
+								{
+									"key": "shift_id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Pagi\",\n    \"in\": \"08:00\",\n    \"out\": \"16:00\",\n    \"is_default\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/shifts/:shift_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shifts",
+								":shift_id"
+							],
+							"variable": [
+								{
+									"key": "shift_id",
+									"value": "9"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employee Shift",
+			"item": [
+				{
+					"name": "Assign",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2024-04-22\",\n    \"employee_id\": 7,\n    \"shift_id\": 9\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/employee-shifts/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employee-shifts",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unassign",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2024-04-22\",\n    \"employee_id\": 7,\n    \"shift_id\": 9\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/employee-shifts/unassign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employee-shifts",
+								"unassign"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Day Off",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2024-04-23\",\n    \"employee_id\": 7,\n    \"description\": \"Cuti menikah\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/day-offs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"day-offs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendance",
+			"item": [
+				{
+					"name": "Clock In",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 7\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/attendances/clock-in",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"clock-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clock Out",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"employee_id\": 7\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/attendances/clock-out",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"clock-out"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Attendances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/attendances/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "70"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Holiday",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Hari Selasa\",\n    \"type\": 0,\n    \"weekday\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/holidays",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"holidays"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/employees",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/employees/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/employees/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Agatha\",\n    \"phone\": \"10210291029120\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/employees/:employee_id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"employees",
+								":employee_id"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
