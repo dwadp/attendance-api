@@ -7,7 +7,7 @@ import (
 )
 
 type Holiday struct {
-	ID        uint                 `json:"uint"`
+	ID        uint                 `json:"id"`
 	Name      string               `json:"name"`
 	Type      holidayTypes.Holiday `json:"type"`
 	Weekday   *time.Weekday        `json:"weekday,omitempty"`
