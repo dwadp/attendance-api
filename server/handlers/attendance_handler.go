@@ -56,10 +56,27 @@ func handleRequestClockOut(service *attendance.Service, v *validator.Validator) 
 	}
 }
 
+func handleListAttendances(service *attendance.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		employeeID, err := c.ParamsInt("employee_id")
+		if err != nil {
+			return response.ErrBadRequest(c, fmt.Errorf("unable to parse employee_id: %v", err))
+		}
+
+		attendances, err := service.FindAllEmployeeAttendances(c.UserContext(), uint(employeeID))
+		if err != nil {
+			return response.ErrInternalServer(c, err)
+		}
+
+		return response.OK(c, attendances)
+	}
+}
+
 func RegisterAttendance(router fiber.Router, store store.Store, v *validator.Validator) {
 	holidayService := holiday.NewService(store)
 	attendanceService := attendance.NewService(store, holidayService)
 
 	router.Post("/clock-in", handleRequestClockIn(attendanceService, v))
 	router.Post("/clock-out", handleRequestClockOut(attendanceService, v))
+	router.Get("/:employee_id", handleListAttendances(attendanceService))
 }

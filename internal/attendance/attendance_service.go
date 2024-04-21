@@ -11,6 +11,8 @@ import (
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/store"
 	"github.com/dwadp/attendance-api/store/db"
+	"github.com/golang-module/carbon/v2"
+	"slices"
 	"time"
 )
 
@@ -74,6 +76,44 @@ func (s *Service) ClockOut(ctx context.Context, req models.AttendanceRequest) (*
 	}
 
 	return s.store.SaveAttendance(ctx, *attendance)
+}
+
+func (s *Service) FindAllEmployeeAttendances(ctx context.Context, employeeID uint) ([]*models.Attendance, error) {
+	attendances, err := s.store.FindAllAttendances(ctx, employeeID)
+	if err != nil {
+		return nil, err
+	}
+
+	now := carbon.Now().StartOfMonth()
+	result := make([]*models.Attendance, now.DaysInMonth())
+
+	for day := 1; day <= now.DaysInMonth(); day++ {
+		date := now.SetDay(day)
+		key := day - 1
+
+		index := slices.IndexFunc(attendances, func(a *models.Attendance) bool {
+			return date.ToDateString() == a.Date.T.Format("2006-01-02")
+		})
+
+		if index >= 0 {
+			result[key] = attendances[index]
+		} else {
+			result[key] = &models.Attendance{
+				ID:             0,
+				EmployeeID:     employeeID,
+				ClockInStatus:  types.Alpha,
+				ClockOutStatus: types.Alpha,
+				Date: db.Date{
+					T:     date.StdTime(),
+					Valid: true,
+				},
+				CreatedAt: date.StdTime(),
+				UpdatedAt: date.StdTime(),
+			}
+		}
+	}
+
+	return result, nil
 }
 
 func (s *Service) getShift(ctx context.Context, employeeID uint, date time.Time) (shift *models.Shift, err error) {

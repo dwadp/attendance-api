@@ -41,4 +41,5 @@ type Store interface {
 	SaveAttendance(ctx context.Context, attendance models.Attendance) (*models.Attendance, error)
 	UpdateAttendance(ctx context.Context, attendance *models.Attendance) (*models.Attendance, error)
 	FindAttendanceByEmployeeID(ctx context.Context, employeeID uint, date time.Time) (*models.Attendance, error)
+	FindAllAttendances(ctx context.Context, employeeID uint) ([]*models.Attendance, error)
 }

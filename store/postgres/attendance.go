@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dwadp/attendance-api/models"
+	"github.com/golang-module/carbon/v2"
 	"time"
 )
 
@@ -117,4 +118,66 @@ func (p *Postgres) UpdateAttendance(ctx context.Context, attendance *models.Atte
 	}
 
 	return attendance, nil
+}
+
+func (p *Postgres) FindAllAttendances(ctx context.Context, employeeID uint) ([]*models.Attendance, error) {
+	var attendances []*models.Attendance
+
+	query := `
+		SELECT
+			id,
+			employee_id,
+			shift_id,
+			shift_name,
+			shift_in,
+			shift_out,
+			clock_in,
+			clock_out, 
+			clock_in_status,
+			clock_out_status,
+			date,
+			created_at,
+			updated_at
+		FROM
+			attendances
+		WHERE employee_id = $1 AND (date BETWEEN $2 AND $3)
+		ORDER BY date`
+
+	rows, err := p.db.QueryContext(ctx, query,
+		employeeID,
+		carbon.Now().StartOfMonth().ToDateString(),
+		carbon.Now().EndOfMonth().ToDateString(),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var attendance models.Attendance
+
+		if err := rows.Scan(
+			&attendance.ID,
+			&attendance.EmployeeID,
+			&attendance.ShiftID,
+			&attendance.ShiftName,
+			&attendance.ShiftIn,
+			&attendance.ShiftOut,
+			&attendance.ClockIn,
+			&attendance.ClockOut,
+			&attendance.ClockInStatus,
+			&attendance.ClockOutStatus,
+			&attendance.Date,
+			&attendance.CreatedAt,
+			&attendance.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		attendances = append(attendances, &attendance)
+	}
+
+	return attendances, nil
 }

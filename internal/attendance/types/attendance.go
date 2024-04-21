@@ -1,5 +1,9 @@
 package types
 
+import (
+	"strconv"
+)
+
 type Type string
 
 type Status string
@@ -17,3 +21,13 @@ const (
 	NoClockOut        = "no_clock_out"
 	Valid             = "valid"
 )
+
+func (s Status) MarshalJSON() ([]byte, error) {
+	if s == "" {
+		return []byte("null"), nil
+	}
+
+	quoted := strconv.Quote(string(s))
+
+	return []byte(quoted), nil
+}
