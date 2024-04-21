@@ -93,7 +93,7 @@
 							"variable": [
 								{
 									"key": "employee_id",
-									"value": "6"
+									"value": "1"
 								}
 							]
 						}
@@ -145,7 +145,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Malam\",\n    \"in\": \"23:00\",\n    \"out\": \"07:00\",\n    \"is_default\": true\n}",
+							"raw": "{\n    \"name\": \"Pagi\",\n    \"in\": \"08:00\",\n    \"out\": \"16:00\",\n    \"is_default\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -274,7 +274,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"date\": \"2024-04-22\",\n    \"employee_id\": 7,\n    \"shift_id\": 9\n}",
+							"raw": "{\n    \"date\": \"2024-04-21\",\n    \"employee_id\": 1,\n    \"shift_id\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -434,6 +434,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Export List Attendance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/attendances/:employee_id/export",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								":employee_id",
+								"export"
+							],
+							"variable": [
+								{
+									"key": "employee_id",
+									"value": "70"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -472,12 +497,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/employees",
+							"raw": "{{base_url}}/holidays",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"employees"
+								"holidays"
 							]
 						}
 					},
@@ -489,18 +514,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/employees/:employee_id",
+							"raw": "{{base_url}}/holidays/:holiday_id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"employees",
-								":employee_id"
+								"holidays",
+								":holiday_id"
 							],
 							"variable": [
 								{
-									"key": "employee_id",
-									"value": "6"
+									"key": "holiday_id",
+									"value": "1"
 								}
 							]
 						}
@@ -513,18 +538,18 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/employees/:employee_id",
+							"raw": "{{base_url}}/holidays/:holiday_id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"employees",
-								":employee_id"
+								"holidays",
+								":holiday_id"
 							],
 							"variable": [
 								{
-									"key": "employee_id",
-									"value": "6"
+									"key": "holiday_id",
+									"value": "1"
 								}
 							]
 						}
@@ -538,7 +563,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Agatha\",\n    \"phone\": \"10210291029120\"\n}",
+							"raw": "{\n    \"name\": \"Hari Selasa\",\n    \"type\": 1,\n    \"weekday\": 2\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -546,18 +571,18 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/employees/:employee_id",
+							"raw": "{{base_url}}/holidays/:holiday_id",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"employees",
-								":employee_id"
+								"holidays",
+								":holiday_id"
 							],
 							"variable": [
 								{
-									"key": "employee_id",
-									"value": "7"
+									"key": "holiday_id",
+									"value": "1"
 								}
 							]
 						}
