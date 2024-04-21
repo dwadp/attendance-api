@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/dwadp/attendance-api/internal"
 	"github.com/dwadp/attendance-api/internal/attendance"
 	"github.com/dwadp/attendance-api/internal/attendance/types"
 	"github.com/dwadp/attendance-api/internal/holiday"
@@ -31,6 +32,10 @@ func handleRequestClockIn(service *attendance.Service, v *validator.Validator) f
 
 		result, err := service.ClockIn(c.UserContext(), request)
 		if err != nil {
+			if errors.Is(err, internal.ErrIsOnHoliday) || errors.Is(err, internal.ErrDayOffExistsOnDate) {
+				return response.ErrBadRequest(c, err)
+			}
+
 			return response.ErrInternalServer(c, err)
 		}
 
@@ -53,6 +58,10 @@ func handleRequestClockOut(service *attendance.Service, v *validator.Validator) 
 
 		result, err := service.ClockOut(c.UserContext(), request)
 		if err != nil {
+			if errors.Is(err, internal.ErrIsOnHoliday) || errors.Is(err, internal.ErrDayOffExistsOnDate) {
+				return response.ErrBadRequest(c, err)
+			}
+
 			return response.ErrInternalServer(c, err)
 		}
 
