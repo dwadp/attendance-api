@@ -48,14 +48,17 @@ func (d *Date) Scan(value any) error {
 		}
 
 		*d = Date{T: r, Valid: true}
+		break
 	case time.Time:
 		*d = Date{T: time.Date(v.Year(), v.Month(), v.Day(), 0, 0, 0, 0, v.Location()), Valid: true}
+		break
 	case []byte:
 		r, err := time.Parse("2006-01-02", string(v))
 		if err != nil {
 			return nil
 		}
 		*d = Date{T: r, Valid: true}
+		break
 	}
 
 	return nil
@@ -130,14 +133,17 @@ func (t *Time) Scan(value any) error {
 			return err
 		}
 		*t = Time{T: r, Valid: true}
+		break
 	case time.Time:
 		*t = Time{T: v, Valid: true}
+		break
 	case []byte:
 		r, err := time.Parse("15:04:05", string(v))
 		if err != nil {
 			return nil
 		}
 		*t = Time{T: r, Valid: true}
+		break
 	}
 
 	return nil
