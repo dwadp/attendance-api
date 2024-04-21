@@ -12,6 +12,7 @@ import (
 	"github.com/dwadp/attendance-api/store"
 	"github.com/dwadp/attendance-api/store/db"
 	"github.com/golang-module/carbon/v2"
+	"github.com/xuri/excelize/v2"
 	"slices"
 	"time"
 )
@@ -114,6 +115,80 @@ func (s *Service) FindAllEmployeeAttendances(ctx context.Context, employeeID uin
 	}
 
 	return result, nil
+}
+
+func (s *Service) ExportAttendance(ctx context.Context, employeeID uint) (*models.Employee, *excelize.File, error) {
+	employee, err := s.store.FindEmployeeByID(ctx, employeeID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	attendances, err := s.FindAllEmployeeAttendances(ctx, employeeID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	f := excelize.NewFile()
+	defer f.Close()
+
+	sheetName := "Sheet1"
+	sheet, err := f.NewSheet(sheetName)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	f.SetCellValue(sheetName, "A2", "Date")
+	f.SetCellValue(sheetName, "B2", "Shift Name")
+	f.SetCellValue(sheetName, "C2", "Shift In")
+	f.SetCellValue(sheetName, "D2", "Shift Out")
+	f.SetCellValue(sheetName, "E2", "Clock In")
+	f.SetCellValue(sheetName, "F2", "Clock Out")
+	f.SetCellValue(sheetName, "G2", "Clock In Status")
+	f.SetCellValue(sheetName, "H2", "Clock Out Status")
+
+	row := 3
+	for _, attendance := range attendances {
+		shiftName := "-"
+		shiftIn := "-"
+		shiftOut := "-"
+		clockIn := "-"
+		clockOut := "-"
+
+		if attendance.ShiftName.Valid {
+			shiftName = attendance.ShiftName.String
+		}
+
+		if !attendance.ShiftIn.IsZero() {
+			shiftIn = attendance.ShiftIn.Format("2006-01-02 15:04-05")
+		}
+
+		if !attendance.ShiftOut.IsZero() {
+			shiftOut = attendance.ShiftOut.Format("2006-01-02 15:04-05")
+		}
+
+		if attendance.ClockIn.Valid {
+			clockIn = attendance.ClockIn.Time.Format("2006-01-02 15:04:05")
+		}
+
+		if attendance.ClockOut.Valid {
+			clockOut = attendance.ClockOut.Time.Format("2006-01-02 15:04:05")
+		}
+
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), attendance.Date.T.Format("2006-01-02"))
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), shiftName)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), shiftIn)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), shiftOut)
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), clockIn)
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), clockOut)
+		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), attendance.GetClockInStatus())
+		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), attendance.GetClockOutStatus())
+
+		row++
+	}
+
+	f.SetActiveSheet(sheet)
+
+	return employee, f, nil
 }
 
 func (s *Service) getShift(ctx context.Context, employeeID uint, date time.Time) (shift *models.Shift, err error) {

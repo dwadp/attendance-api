@@ -24,6 +24,10 @@ type Attendance struct {
 }
 
 func (a *Attendance) GetClockInStatus() types.Status {
+	if a.ID == 0 && !a.ClockIn.Valid && a.ShiftIn.IsZero() {
+		return types.Alpha
+	}
+
 	if !a.ClockIn.Valid {
 		return types.NoClockIn
 	}
@@ -32,6 +36,10 @@ func (a *Attendance) GetClockInStatus() types.Status {
 }
 
 func (a *Attendance) GetClockOutStatus() types.Status {
+	if a.ID == 0 && !a.ClockOut.Valid && a.ShiftOut.IsZero() {
+		return types.Alpha
+	}
+
 	if !a.ClockOut.Valid {
 		return types.NoClockOut
 	}
@@ -65,11 +73,6 @@ func (a *Attendance) MarshalJSON() ([]byte, error) {
 
 	if a.ID != 0 {
 		value.ID = &a.ID
-	}
-
-	if value.ID == nil {
-		value.ClockInStatus = types.Alpha
-		value.ClockOutStatus = types.Alpha
 	}
 
 	if !a.ShiftIn.IsZero() {
