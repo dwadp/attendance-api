@@ -52,7 +52,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/attendance-api/config.yml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Set the config file (default is $HOME/attendance-api/config.yml)")
 }
 
 func initConfig() {
