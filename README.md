@@ -38,5 +38,26 @@ After all of the above steps successfully finished, you can run the API server t
 
 You can test the API by using the postman collection that i've provided [here](https://github.com/dwadp/attendance-api/blob/main/postman/Attendances.postman_collection.json).
 
+### Docker
+Another option to run this project is by using docker. Please make sure you have this docker requirements on your local machine:
+* Docker Client & Server (**v26.0.2 or higher**)
+* Docker Compose (**v2.26.1**)
+
+Like the other steps above, the first thing you want to do is to configure the `config.yml` file. You can refer to [this file](https://github.com/dwadp/attendance-api/blob/main/config.example.yml) for all available configurations.
+
+
+After you clone this repository, just run:
+```sh
+docker compose up --build -d
+```
+
+#### Migrations
+After you've successfully run the containers. To run the migrations (if you're using docker) you can use this command:
+```sh
+docker exec {container_name} sh -c "attendance --config /home/server/config.yml migration up"
+```
+
+Make sure you replace the `{container_name` with your own container name.
+
 ### Notes
 If you have a problem running this project on your local machine, feel free to contact me at: [dewaadiperdana@gmail.com](mailto:dewaadiperdana@gmail.com).

@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:13-bullseye
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      POSTGRES_DB: attendance
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    # ports:
+    #   - "5432:5432"
+    # Uncomment this if you want to access the database from your host machine
+    networks:
+      - coding-challenge
+
+  app:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    volumes:
+      - ./config.yml:/home/server/config.yml
+    networks:
+      - coding-challenge
+
+networks:
+  coding-challenge:
+    driver: bridge
+
+volumes:
+  postgres:
