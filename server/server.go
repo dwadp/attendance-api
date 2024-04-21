@@ -7,6 +7,7 @@ import (
 	"github.com/dwadp/attendance-api/server/validator"
 	"github.com/dwadp/attendance-api/store"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/rs/zerolog/log"
 	"net"
 	"os"
@@ -33,6 +34,13 @@ func New(cfg *config.Config, s store.Store, db *sql.DB, validator *validator.Val
 }
 
 func (s *Server) Start() error {
+	users := map[string]string{}
+	users[s.Config.Auth.User] = s.Config.Auth.Pass
+
+	s.App.Use(basicauth.New(basicauth.Config{
+		Users: users,
+	}))
+
 	handlers.RegisterEmployee(s.App.Group("employees"), s.Store, s.Validator)
 	handlers.RegisterShift(s.App.Group("shifts"), s.Store, s.Validator)
 	handlers.RegisterDayOff(s.App.Group("day-offs"), s.Store, s.Validator)
