@@ -185,6 +185,29 @@ func (p *Postgres) DeleteShift(ctx context.Context, id uint) error {
 	return nil
 }
 
+func (p *Postgres) FindDefaultShift(ctx context.Context) (*models.Shift, error) {
+	var shift models.Shift
+
+	query := `SELECT "id", "name", "in", "out", "is_default", "created_at", "updated_at" FROM shifts WHERE "is_default"=true`
+	err := p.db.
+		QueryRowContext(ctx, query).
+		Scan(
+			&shift.ID,
+			&shift.Name,
+			&shift.In,
+			&shift.Out,
+			&shift.IsDefault,
+			&shift.CreatedAt,
+			&shift.UpdatedAt,
+		)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &shift, nil
+}
+
 func (p *Postgres) FindEmployeeShift(ctx context.Context, employeeID uint, date time.Time) (*models.EmployeeShift, error) {
 	var employeeShift models.EmployeeShift
 

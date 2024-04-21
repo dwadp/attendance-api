@@ -5,17 +5,17 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/dwadp/attendance-api/internal"
-	"github.com/dwadp/attendance-api/internal/holiday"
+	holidayInternal "github.com/dwadp/attendance-api/internal/holiday"
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/store"
 )
 
 type Service struct {
 	store          store.Store
-	holidayService *holiday.Service
+	holidayService *holidayInternal.Service
 }
 
-func NewService(store store.Store, holidayService *holiday.Service) *Service {
+func NewService(store store.Store, holidayService *holidayInternal.Service) *Service {
 	return &Service{
 		store:          store,
 		holidayService: holidayService,
@@ -23,7 +23,12 @@ func NewService(store store.Store, holidayService *holiday.Service) *Service {
 }
 
 func (s *Service) Create(ctx context.Context, request models.DayOffRequest) (*models.DayOff, error) {
-	if h := s.holidayService.IsHolidayExistOn(request.Date.T); h != nil {
+	holiday, err := s.holidayService.IsHolidayExistOn(ctx, request.Date.T)
+	if err != nil {
+		return nil, err
+	}
+
+	if holiday != nil {
 		return nil, internal.ErrIsOnHoliday
 	}
 

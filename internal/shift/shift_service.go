@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dwadp/attendance-api/internal"
-	"github.com/dwadp/attendance-api/internal/holiday"
+	holidayInternal "github.com/dwadp/attendance-api/internal/holiday"
 	"github.com/dwadp/attendance-api/models"
 	"github.com/dwadp/attendance-api/store"
 	"github.com/dwadp/attendance-api/store/db"
@@ -14,10 +14,10 @@ import (
 
 type Service struct {
 	store    store.Store
-	hService *holiday.Service
+	hService *holidayInternal.Service
 }
 
-func NewService(store store.Store, hService *holiday.Service) *Service {
+func NewService(store store.Store, hService *holidayInternal.Service) *Service {
 	return &Service{store: store, hService: hService}
 }
 
@@ -60,12 +60,13 @@ func (s *Service) AssignEmployee(ctx context.Context, assign models.AssignEmploy
 		}
 	}
 
-	if h := s.hService.IsHolidayExistOn(assign.Date.T); h != nil {
-		if h.Type == holiday.Weekend {
-			return nil, internal.ErrIsOnHoliday
-		} else if h.Type == holiday.NationalHoliday {
-			return nil, internal.ErrIsOnHoliday
-		}
+	holiday, err := s.hService.IsHolidayExistOn(ctx, assign.Date.T)
+	if err != nil {
+		return nil, err
+	}
+
+	if holiday != nil {
+		return nil, internal.ErrIsOnHoliday
 	}
 
 	result, err := s.store.SaveEmployeeShift(ctx, models.EmployeeShift{

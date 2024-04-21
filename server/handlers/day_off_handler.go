@@ -13,7 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func handleRequestDayOff(store store.Store, v *validator.Validator) fiber.Handler {
+func handleRequestDayOff(v *validator.Validator, service *dayoff.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var request models.DayOffRequest
 		if err := c.BodyParser(&request); err != nil {
@@ -24,15 +24,7 @@ func handleRequestDayOff(store store.Store, v *validator.Validator) fiber.Handle
 			return response.ErrUnprocessableEntity(c, v.SerializeErrors(err, request))
 		}
 
-		holidays, err := store.FindAllHolidays(c.UserContext(), request.Date.T)
-		if err != nil {
-			return response.ErrInternalServer(c, fmt.Errorf("unable to find holidays: %v", err))
-		}
-
-		holidayService := holiday.NewService(holidays)
-		dayOffService := dayoff.NewService(store, holidayService)
-
-		result, err := dayOffService.Create(c.UserContext(), request)
+		result, err := service.Create(c.UserContext(), request)
 		if err != nil {
 			if errors.Is(err, internal.ErrShiftExists) {
 				return response.ErrBadRequest(c, err)
@@ -48,5 +40,8 @@ func handleRequestDayOff(store store.Store, v *validator.Validator) fiber.Handle
 }
 
 func RegisterDayOff(router fiber.Router, store store.Store, v *validator.Validator) {
-	router.Post("/", handleRequestDayOff(store, v))
+	holidayService := holiday.NewService(store)
+	dayOffService := dayoff.NewService(store, holidayService)
+
+	router.Post("/", handleRequestDayOff(v, dayOffService))
 }

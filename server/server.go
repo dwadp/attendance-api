@@ -37,6 +37,7 @@ func (s *Server) Start() error {
 	handlers.RegisterShift(s.App.Group("shifts"), s.Store, s.Validator)
 	handlers.RegisterDayOff(s.App.Group("day-offs"), s.Store, s.Validator)
 	handlers.RegisterEmployeeShift(s.App.Group("employee-shifts"), s.Store, s.Validator)
+	handlers.RegisterAttendance(s.App.Group("attendances"), s.Store, s.Validator)
 
 	go func() {
 		if err := s.App.Listen(net.JoinHostPort(s.Config.Server.Host, s.Config.Server.Port)); err != nil {

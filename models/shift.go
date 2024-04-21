@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/dwadp/attendance-api/store/db"
+	"time"
 )
 
 type Shift struct {
@@ -12,6 +13,43 @@ type Shift struct {
 	IsDefault bool                `json:"is_default"`
 	CreatedAt db.NullableDateTime `json:"created_at"`
 	UpdatedAt db.NullableDateTime `json:"updated_at"`
+}
+
+func (s *Shift) GetIn() time.Time {
+	now := time.Now()
+	in := s.In.T
+
+	return time.Date(
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		in.Hour(),
+		in.Minute(),
+		in.Second(),
+		0,
+		now.Location(),
+	)
+}
+
+func (s *Shift) GetOut() time.Time {
+	now := time.Now()
+	out := s.Out.T
+	date := time.Date(
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		out.Hour(),
+		out.Minute(),
+		out.Second(),
+		0,
+		now.Location(),
+	)
+
+	if out.Before(s.In.T) {
+		return date.Add(24 * time.Hour)
+	}
+
+	return date
 }
 
 type UpsertShift struct {

@@ -14,22 +14,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func handleEmployeeShiftAssignment(store store.Store) fiber.Handler {
+func handleEmployeeShiftAssignment(service *shift.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var assign models.AssignEmployeeShift
 		if err := c.BodyParser(&assign); err != nil {
 			return response.ErrBadRequest(c, fmt.Errorf("unable to parse request body: %v", err))
 		}
 
-		holidays, err := store.FindAllHolidays(c.UserContext(), assign.Date.T)
-		if err != nil {
-			return response.ErrInternalServer(c, err)
-		}
-
-		hService := holiday.NewService(holidays)
-		shiftService := shift.NewService(store, hService)
-
-		result, err := shiftService.AssignEmployee(c.UserContext(), assign)
+		result, err := service.AssignEmployee(c.UserContext(), assign)
 		if err != nil {
 			if errors.Is(err, internal.ErrIsOnHoliday) {
 				return response.ErrBadRequest(c, err)
@@ -66,6 +58,9 @@ func handleEmployeeShiftUnassignment(store store.Store, v *validator.Validator) 
 }
 
 func RegisterEmployeeShift(router fiber.Router, store store.Store, v *validator.Validator) {
-	router.Post("/assign", handleEmployeeShiftAssignment(store))
+	holidayService := holiday.NewService(store)
+	shiftService := shift.NewService(store, holidayService)
+
+	router.Post("/assign", handleEmployeeShiftAssignment(shiftService))
 	router.Post("/unassign", handleEmployeeShiftUnassignment(store, v))
 }
