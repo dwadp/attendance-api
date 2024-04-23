@@ -19,7 +19,7 @@ The binary provides you some ability which is:
 #### Configuration
 There is a `config.example.yml` file in this repository which you can copy and paste on your local machine as the main configuration of the API. Before you move further, please adjust the configuration based on your local machine ***especially*** the database (`PostgreSQl`).
 
-**IMPORTANT**
+> [!IMPORTANT]
 > The binary default configuration will be at your `$HOME/.attendance-api/confg.yml`. Although you can customize it by providing a `--config` flag every time you run the binary
 > which point to an absolute path to where you put the configuration file.
 
@@ -59,5 +59,5 @@ docker exec {container_name} sh -c "attendance --config /home/server/config.yml 
 
 Make sure you replace the `{container_name` with your own container name.
 
-### Notes
+> [!NOTE]
 If you have a problem running this project on your local machine, feel free to contact me at: [dewaadiperdana@gmail.com](mailto:dewaadiperdana@gmail.com).
